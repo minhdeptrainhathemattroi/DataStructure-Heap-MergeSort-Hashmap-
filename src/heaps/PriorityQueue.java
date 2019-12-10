@@ -2,6 +2,7 @@ package heaps;
 
 import lib.Pair;
 
+import java.util.NoSuchElementException;
 import java.util.Queue;
 
 /**
@@ -41,8 +42,8 @@ public class PriorityQueue<T> {
 
         @Override
         public int compareTo(ComparablePair<L, R> o) {
+            return Integer.compare(this.left.compareTo(o.left), 0);
             /* YOUR CODE HERE */
-            return -1;
         }
     }
 
@@ -56,21 +57,22 @@ public class PriorityQueue<T> {
      */
 
     public void insert(Integer priority, T value) {
+        heap.insert(new ComparablePair<>(priority,value));
+
         /* YOUR CODE HERE */
     }
 
     public T peek() {
-        /* YOUR CODE HERE */
-        return null;
+        return  heap.peek().right;
     }
 
     public T remove() {
-        /* YOUR CODE HERE */
-        return null;
+        return heap.remove().right;
     }
 
     public int size() {
+
         /* YOUR CODE HERE */
-        return 0;
+        return heap.container.size()-1;
     }
 }

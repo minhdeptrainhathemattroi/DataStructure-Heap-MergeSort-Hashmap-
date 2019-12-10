@@ -1,12 +1,11 @@
 package hashing;
 
+
 import lib.Pair;
 
+
 import java.lang.reflect.Array;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * HashMap implementation using hashing w/ linked list buckets.
@@ -61,18 +60,44 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         if (table[slot] == null) {
             table[slot] = new LinkedList<>();
         }
-        /*
-            Use the .set(value) method on the ListIterator to do
-            an O(1) replacement of a value.
-         */
         ListIterator<Pair<K, V>> i = table[slot].listIterator();
+        while (i.hasNext()) {
+            Pair<K, V> meo = i.next();
+            if (meo.left != null ) {
+                if(meo.left.equals(key)){
+                    V hehe = meo.right;
+                    i.set(new Pair<>(key, value));
+                    if (hehe == null) {
+                        return null;
+                        }
+                    else {
+                        return hehe;
+                        }}
 
 
+                    }
+            else if (meo.left == null && key == null) {
+                V hehe = meo.right;
+                i.set(new Pair<>(null, value));
+                if (hehe == null) {
+                    return null;
+                        }
+                else {
+                    return hehe;
+                        }
+                    }
 
+                }
+
+        table[slot].add(table[slot].size(),new Pair<>(key,value));
+        size++;
+        if(size/table.length>LOAD_FACTOR){
+            this.expand();
         }
-
-        /* YOUR CODE HERE */
         return null;
+
+
+
     }
 
     public V get(K key) {
@@ -80,9 +105,24 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         if (table[slot] == null) {
             return null;
         }
+        V value= null;
+        ListIterator<Pair<K,V>> i= table[slot].listIterator();
+        while(i.hasNext()){
+            Pair<K,V> meo= i.next();
+
+            if(meo.left!=null&&meo.left.equals(key)){
+                value=meo.right;
+                break;}
+            else if(meo.left==null&&key==null){
+                value=meo.right;
+                break; }
+            }
+
+            return value;
+
+
 
         /* YOUR CODE HERE */
-        return null;
     }
 
     public V remove(K key) {
@@ -95,11 +135,28 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
             Use the remove() method supplied by ListIterator
             to do an O(1) remove on the list bucket.
          */
-        ListIterator<Pair<K, V>> i = table[slot].listIterator();
+        else {
+            V value = table[slot].getFirst().right;
+            ListIterator<Pair<K, V>> i = table[slot].listIterator();
+            while (i.hasNext()) {
+                Pair<K,V> minh= i.next();
+                if(minh.left!=null&&minh.left==key){
+                    value = minh.right;
+                    i.remove();
+                    size--;
+
+                }
+                else if (minh.left==null&&key==null){
+                    value=minh.right;
+                    i.remove();
+                    size--;
+
+                }
+            }
 
 
-        /* YOUR CODE HERE */
-        return null;
+            return value;
+        }
     }
 
     public int size() {
@@ -115,7 +172,14 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
     }
 
     private class HashMapIterator implements Iterator<Pair<K, V>> {
+        protected Pair<K,V> a ;
+        protected  Pair<K,V> depTrai=null;
         HashMap<K, V> hashMap;
+        protected int i=0;
+        protected int j=0;
+
+
+
 
         /* YOUR CODE HERE */
 
@@ -123,30 +187,93 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         HashMapIterator(HashMap<K, V> hashMap) {
             this.hashMap = hashMap;
 
+
+
             /* YOUR CODE HERE */
         }
+        /*
+            hasNext should be worst case O(n), not O(n^2)
+            Hint: Use an Iterator to retrieve individual bucket values
+            instead of .get(index), which is O(n) on its own
+             */
+
 
         @Override
         public boolean hasNext() {
-            /*
-                hasNext should be worst case O(n), not O(n^2)
-                Hint: Use an Iterator to retrieve individual bucket values
-                instead of .get(index), which is O(n) on its own
-             */
+           for(int t=i;i<table.length;i++){
+               if(table[i]==null&&i==table.length-1){
+                   return false;
+               }
+                if(table[i]==null){
+                    continue;}
+                else{
+                ListIterator<Pair<K,V>> minh= table[i].listIterator();
+                if(minh.hasNext()) {
+                    Pair<K,V> b=minh.next();
+                    if(depTrai!=b){
+                    depTrai =b;
+                    if(!minh.hasNext()){
+                    i++;}
+                    return true;
+                    }
+             }
+                }
 
-            /* YOUR CODE HERE */
+        }
             return false;
         }
 
         @Override
         public Pair<K, V> next() {
+           if (depTrai!=null||hasNext()) {
+                for(int c=j; j<table.length;j++){
+                    if(table[j]==null){
+                        continue;
+                    }
+                    if(table[j]==null&&j==table.length-1){
+                        break;
+                    }
+                    ListIterator<Pair<K,V>> minh= table[j].listIterator();
+                    if(minh.hasNext()){
+                        Pair<K,V> quaDi= minh.next();
+                        if(a!=quaDi){
+                            a=quaDi;
+                        depTrai=null;
+                        if(!minh.hasNext()){
+                        j++;
+                        }
+                        break;
+                        }
+                        else{
+                            if(minh.hasNext()){
+                                a=minh.next();
+                            }
+                        }
+                    }
+
+
+                }
+                return a;
+}
+            else {
+                a=null;
+                throw new NoSuchElementException();
+            }
+
+
+
             /* YOUR CODE HERE */
-            return null;
         }
 
         @Override
         public void remove() {
-            /* YOUR CODE HERE */
+            if(a==null){
+                throw  new IllegalStateException();
+            }
+            else{
+                hashMap.remove(a.left);
+                a=null;
+            }
         }
     }
 
@@ -154,10 +281,26 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
     private void expand() {
         /* DO NOT MODIFY */
         LinkedList<Pair<K, V>>[] newTable = (LinkedList<Pair<K, V>>[]) Array.newInstance(LinkedList.class, table.length * 2);
+        LinkedList<Pair<K, V>>[] quaDi= this.table;
+        this.table= newTable;
+        size=0;
+
+
+        for(int i=0; i<quaDi.length;i++){
+
+            if(quaDi[i]!=null){
+                ListIterator<Pair<K,V>> ble= quaDi[i].listIterator();
+                while (ble.hasNext()){
+                    Pair<K,V> minh=ble.next();
+                    put(minh.left,minh.right);
+                }
+            }
+
+            }
+
+
 
         /* YOUR CODE HERE */
-
-        this.table = newTable;
     }
 
 }

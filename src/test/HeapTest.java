@@ -119,7 +119,7 @@ public class HeapTest {
         heap.insert(BigInteger.ONE);
 
         assertEquals(Arrays.asList(BigInteger.ONE, BigInteger.TEN, BigInteger.TWO),
-                     heap.container.subList(1, heap.container.size()));
+                heap.container.subList(1, heap.container.size()));
         validateHeap(heap);
 
         assertEquals(BigInteger.ONE, heap.peek());
