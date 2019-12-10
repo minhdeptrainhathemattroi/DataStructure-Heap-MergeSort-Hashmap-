@@ -1,6 +1,5 @@
 package heaps;
 
-import java.security.UnrecoverableEntryException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NoSuchElementException;

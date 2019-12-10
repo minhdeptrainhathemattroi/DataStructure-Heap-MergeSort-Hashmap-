@@ -2,9 +2,6 @@ package heaps;
 
 import lib.Pair;
 
-import java.util.NoSuchElementException;
-import java.util.Queue;
-
 /**
  * A Priority Queue is a kind of queue where every element has a priority,
  * and the "highest priority" (lower values are higher priority) elements

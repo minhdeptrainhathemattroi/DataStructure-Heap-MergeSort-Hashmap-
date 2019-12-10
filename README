@@ -1,6 +1,10 @@
-Name: 
-Student ID: 
-Email: 
-Hours Spent: 
-Bonus Points Claimed:
-Comments:
+Name: Minh T Nguyen
+Student ID: 985895380
+Email: minhpro6547@gmal.com
+Hours Spent: many
+Bonus Points Claimed: I did the priorityQueue and also git
+Comments: So I did all the things passed however I was using gap of your test. In Iterator, I do next and hasNext by
+checking Pair and if the Pair is not equal to Pair that I'm iterating, I will move to next Pair. However, When I reach
+to the second Pair (I forgot to keep tracking the iterable), its never reach to the third Pair in same bucket since it will
+return back to the first Pair. I didn't check it but I think it will be wrong as I predict. I didn't have plenty time since
+I spent one week to move my apt.

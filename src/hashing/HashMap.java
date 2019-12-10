@@ -3,22 +3,24 @@ package hashing;
 
 import lib.Pair;
 
-
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * HashMap implementation using hashing w/ linked list buckets.
  * Please refer to the official HashMap Java 11 documentation
  * for an explanation on the behavior of each of the methods below.
- *
+ * <p>
  * https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html
  *
  * @param <K> Type of the keys.
  * @param <V> Type of the values.
  */
 public class HashMap<K, V> implements Iterable<Pair<K, V>> {
-    private static final int DEFAULT_CAPACITY   = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
     // Normally this would be private, but we'll make it public
@@ -63,39 +65,28 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         ListIterator<Pair<K, V>> i = table[slot].listIterator();
         while (i.hasNext()) {
             Pair<K, V> meo = i.next();
-            if (meo.left != null ) {
-                if(meo.left.equals(key)){
+            if (meo.left != null) {
+                if (meo.left.equals(key)) {
                     V hehe = meo.right;
                     i.set(new Pair<>(key, value));
-                    if (hehe == null) {
-                        return null;
-                        }
-                    else {
-                        return hehe;
-                        }}
-
-
-                    }
-            else if (meo.left == null && key == null) {
-                V hehe = meo.right;
-                i.set(new Pair<>(null, value));
-                if (hehe == null) {
-                    return null;
-                        }
-                else {
                     return hehe;
-                        }
-                    }
-
                 }
 
-        table[slot].add(table[slot].size(),new Pair<>(key,value));
+
+            } else if (meo.left == null && key == null) {
+                V hehe = meo.right;
+                i.set(new Pair<>(null, value));
+                return hehe;
+            }
+
+        }
+
+        table[slot].add(table[slot].size(), new Pair<>(key, value));
         size++;
-        if(size/table.length>LOAD_FACTOR){
+        if (size / table.length > LOAD_FACTOR) {
             this.expand();
         }
         return null;
-
 
 
     }
@@ -105,20 +96,21 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         if (table[slot] == null) {
             return null;
         }
-        V value= null;
-        ListIterator<Pair<K,V>> i= table[slot].listIterator();
-        while(i.hasNext()){
-            Pair<K,V> meo= i.next();
+        V value = null;
+        ListIterator<Pair<K, V>> i = table[slot].listIterator();
+        while (i.hasNext()) {
+            Pair<K, V> meo = i.next();
 
-            if(meo.left!=null&&meo.left.equals(key)){
-                value=meo.right;
-                break;}
-            else if(meo.left==null&&key==null){
-                value=meo.right;
-                break; }
+            if (meo.left != null && meo.left.equals(key)) {
+                value = meo.right;
+                break;
+            } else if (meo.left == null && key == null) {
+                value = meo.right;
+                break;
             }
+        }
 
-            return value;
+        return value;
 
 
 
@@ -139,15 +131,14 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
             V value = table[slot].getFirst().right;
             ListIterator<Pair<K, V>> i = table[slot].listIterator();
             while (i.hasNext()) {
-                Pair<K,V> minh= i.next();
-                if(minh.left!=null&&minh.left==key){
+                Pair<K, V> minh = i.next();
+                if (minh.left != null && minh.left == key) {
                     value = minh.right;
                     i.remove();
                     size--;
 
-                }
-                else if (minh.left==null&&key==null){
-                    value=minh.right;
+                } else if (minh.left == null && key == null) {
+                    value = minh.right;
                     i.remove();
                     size--;
 
@@ -171,12 +162,38 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
         return new HashMapIterator(this);
     }
 
+    @SuppressWarnings("unchecked")
+    private void expand() {
+        /* DO NOT MODIFY */
+        LinkedList<Pair<K, V>>[] newTable = (LinkedList<Pair<K, V>>[]) Array.newInstance(LinkedList.class, table.length * 2);
+        LinkedList<Pair<K, V>>[] quaDi = this.table;
+        this.table = newTable;
+        size = 0;
+
+
+        for (int i = 0; i < quaDi.length; i++) {
+
+            if (quaDi[i] != null) {
+                ListIterator<Pair<K, V>> ble = quaDi[i].listIterator();
+                while (ble.hasNext()) {
+                    Pair<K, V> minh = ble.next();
+                    put(minh.left, minh.right);
+                }
+            }
+
+        }
+
+
+
+        /* YOUR CODE HERE */
+    }
+
     private class HashMapIterator implements Iterator<Pair<K, V>> {
-        protected Pair<K,V> a ;
-        protected  Pair<K,V> depTrai=null;
+        protected Pair<K, V> a;
+        protected Pair<K, V> depTrai = null;
+        protected int i = 0;
+        protected int j = 0;
         HashMap<K, V> hashMap;
-        protected int i=0;
-        protected int j=0;
 
 
 
@@ -200,53 +217,53 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
 
         @Override
         public boolean hasNext() {
-           for(int t=i;i<table.length;i++){
-               if(table[i]==null&&i==table.length-1){
-                   return false;
-               }
-                if(table[i]==null){
-                    continue;}
-                else{
-                ListIterator<Pair<K,V>> minh= table[i].listIterator();
-                if(minh.hasNext()) {
-                    Pair<K,V> b=minh.next();
-                    if(depTrai!=b){
-                    depTrai =b;
-                    if(!minh.hasNext()){
-                    i++;}
-                    return true;
+            for (int t = i; i < table.length; i++) {
+                if (table[i] == null && i == table.length - 1) {
+                    return false;
+                }
+                if (table[i] == null) {
+                    continue;
+                } else {
+                    ListIterator<Pair<K, V>> minh = table[i].listIterator();
+                    if (minh.hasNext()) {
+                        Pair<K, V> b = minh.next();
+                        if (depTrai != b) {
+                            depTrai = b;
+                            if (!minh.hasNext()) {
+                                i++;
+                            }
+                            return true;
+                        }
                     }
-             }
                 }
 
-        }
+            }
             return false;
         }
 
         @Override
         public Pair<K, V> next() {
-           if (depTrai!=null||hasNext()) {
-                for(int c=j; j<table.length;j++){
-                    if(table[j]==null){
+            if (depTrai != null || hasNext()) {
+                for (int c = j; j < table.length; j++) {
+                    if (table[j] == null) {
                         continue;
                     }
-                    if(table[j]==null&&j==table.length-1){
+                    if (table[j] == null && j == table.length - 1) {
                         break;
                     }
-                    ListIterator<Pair<K,V>> minh= table[j].listIterator();
-                    if(minh.hasNext()){
-                        Pair<K,V> quaDi= minh.next();
-                        if(a!=quaDi){
-                            a=quaDi;
-                        depTrai=null;
-                        if(!minh.hasNext()){
-                        j++;
-                        }
-                        break;
-                        }
-                        else{
-                            if(minh.hasNext()){
-                                a=minh.next();
+                    ListIterator<Pair<K, V>> minh = table[j].listIterator();
+                    if (minh.hasNext()) {
+                        Pair<K, V> quaDi = minh.next();
+                        if (a != quaDi) {
+                            a = quaDi;
+                            depTrai = null;
+                            if (!minh.hasNext()) {
+                                j++;
+                            }
+                            break;
+                        } else {
+                            if (minh.hasNext()) {
+                                a = minh.next();
                             }
                         }
                     }
@@ -254,9 +271,8 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
 
                 }
                 return a;
-}
-            else {
-                a=null;
+            } else {
+                a = null;
                 throw new NoSuchElementException();
             }
 
@@ -267,40 +283,13 @@ public class HashMap<K, V> implements Iterable<Pair<K, V>> {
 
         @Override
         public void remove() {
-            if(a==null){
-                throw  new IllegalStateException();
-            }
-            else{
+            if (a == null) {
+                throw new IllegalStateException();
+            } else {
                 hashMap.remove(a.left);
-                a=null;
+                a = null;
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void expand() {
-        /* DO NOT MODIFY */
-        LinkedList<Pair<K, V>>[] newTable = (LinkedList<Pair<K, V>>[]) Array.newInstance(LinkedList.class, table.length * 2);
-        LinkedList<Pair<K, V>>[] quaDi= this.table;
-        this.table= newTable;
-        size=0;
-
-
-        for(int i=0; i<quaDi.length;i++){
-
-            if(quaDi[i]!=null){
-                ListIterator<Pair<K,V>> ble= quaDi[i].listIterator();
-                while (ble.hasNext()){
-                    Pair<K,V> minh=ble.next();
-                    put(minh.left,minh.right);
-                }
-            }
-
-            }
-
-
-
-        /* YOUR CODE HERE */
     }
 
 }
